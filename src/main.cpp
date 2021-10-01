@@ -40,6 +40,7 @@
  */
 
 #include "jsbsim_bridge.h"
+#include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
 
 int main(int argc, char *argv[]) {
   // Parse Configurations
@@ -67,8 +68,13 @@ int main(int argc, char *argv[]) {
 
   // Configure JSBSim
   JSBSim::FGFDMExec *fdmexec = new JSBSim::FGFDMExec();
+  
+  // Initialize AirSim client
+  msr::airlib::MultirotorRpcLibClient *client = new msr::airlib::MultirotorRpcLibClient();
 
-  std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, config);
+  client->confirmConnection();
+
+  std::unique_ptr<JSBSimBridge> jsbsim_bridge = std::make_unique<JSBSimBridge>(fdmexec, config, client);
 
   while (true) {
     jsbsim_bridge->Run();

@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.8.11)
 project(jsbsim_bridge)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread")
 
+set(AIRSIM_ROOT "/home/zimmy/Downloads/AirSim_gcc")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(MAVLink)
@@ -61,7 +63,13 @@ add_definitions(
 	--warn-uninitialized
 )
 
-include_directories(include)
+include_directories(include
+					${AIRSIM_ROOT}/AirLib/deps/eigen3
+					${AIRSIM_ROOT}/AirLib/deps/rpclib/include
+					${AIRSIM_ROOT}/AirLib/include
+					${AIRSIM_ROOT}/AirLib/deps/MavLinkCom/include)
+
+link_directories(${AIRSIM_ROOT}/AirLib/lib/x64/Release)
 
 add_executable(jsbsim_bridge
 			   src/main.cpp
@@ -82,7 +90,7 @@ target_include_directories(jsbsim_bridge
                 BEFORE
 				PUBLIC ${MAVLINK_INCLUDE_DIRS} ${JSBSIM_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 
-target_link_libraries(jsbsim_bridge ${JSBSIM_LIBRARY} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${Boost_TIMER_LIBRARY_RELEASE} ${EIGEN_LIBRARIES} ${TinyXML_LIBRARIES})
+target_link_libraries(jsbsim_bridge AirLib rpc MavLinkCom ${JSBSIM_LIBRARY} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${Boost_TIMER_LIBRARY_RELEASE} ${EIGEN_LIBRARIES} ${TinyXML_LIBRARIES})
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)

@@ -43,7 +43,7 @@
 
 #include "jsbsim_bridge.h"
 
-JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg) : _fdmexec(fdmexec), _cfg(cfg) {
+JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg, msr::airlib::MultirotorRpcLibClient *client) : _fdmexec(fdmexec), _cfg(cfg), _airsim_client(client) {
   TiXmlHandle config = *_cfg.XmlHandle();
 
   // Config JSBSim FDM
@@ -90,6 +90,10 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
   _actuators->SetActuatorConfigs(config);
 
   _realtime_factor = _cfg.getRealtimeFactor();
+
+  //msr::airlib::MultirotorRpcLibClient client("192.168.160.1");
+
+  //client.confirmConnection();
 }
 
 JSBSimBridge::~JSBSimBridge() {}

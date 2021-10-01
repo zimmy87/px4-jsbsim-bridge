@@ -49,6 +49,7 @@
 #include "sensor_gps_plugin.h"
 #include "sensor_imu_plugin.h"
 #include "sensor_mag_plugin.h"
+#include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
 
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
@@ -61,7 +62,7 @@ static constexpr int kDefaultSITLTcpPort = 4560;
 
 class JSBSimBridge {
  public:
-  JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg);
+  JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg, msr::airlib::MultirotorRpcLibClient *client);
   ~JSBSimBridge();
   void Run();
 
@@ -71,6 +72,7 @@ class JSBSimBridge {
 
   JSBSim::FGFDMExec *_fdmexec;  // FDMExec pointer
   ConfigurationParser &_cfg;
+  msr::airlib::MultirotorRpcLibClient *_airsim_client;
 
   std::unique_ptr<MavlinkInterface> _mavlink_interface;
   std::unique_ptr<SensorImuPlugin> _imu_sensor;
