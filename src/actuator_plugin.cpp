@@ -41,7 +41,7 @@
 
 #include "actuator_plugin.h"
 
-ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim), _last_sim_time(0.0) {}
+ActuatorPlugin::ActuatorPlugin(JSBSim::FGFDMExec *jsbsim, msr::airlib::MultirotorRpcLibClient *client) : _sim_ptr(jsbsim), _last_sim_time(0.0), _airsim_client(client) {}
 
 ActuatorPlugin::~ActuatorPlugin() {}
 
@@ -56,7 +56,10 @@ bool ActuatorPlugin::SetActuatorCommands(const Eigen::VectorXd &actuator_command
 }
 
 bool ActuatorPlugin::SetCommandToProperty(float value, std::string property) {
-  _sim_ptr->SetPropertyValue(property, value);
+  double old_value = _airsim_client->getJSBSimProperty(property);
+  cout << "old actuator " << property << ": " << old_value << std::endl;
+  _airsim_client->setJSBSimProperty(property, value);
+  cout << "new actuator " << property << ": " << value << std::endl;
   return true;
 }
 

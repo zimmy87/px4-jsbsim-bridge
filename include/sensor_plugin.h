@@ -43,12 +43,13 @@
 
 #include "common.h"
 #include "mavlink_interface.h"
+#include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
 
 #include <FGFDMExec.h>
 
 class SensorPlugin {
  public:
-  SensorPlugin(JSBSim::FGFDMExec *jsbsim);
+  SensorPlugin(JSBSim::FGFDMExec *jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~SensorPlugin();
   virtual void setSensorConfigs(const TiXmlElement &configs) = 0;
   void setUpdateRate(double update_rate);
@@ -56,6 +57,7 @@ class SensorPlugin {
 
  protected:
   JSBSim::FGFDMExec *_sim_ptr;
+  msr::airlib::MultirotorRpcLibClient *_airsim_client;
   double _last_sim_time{0.};
   double _update_rate{0.};
 

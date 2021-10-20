@@ -46,7 +46,7 @@
 
 class SensorGpsPlugin : public SensorPlugin {
  public:
-  SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim);
+  SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~SensorGpsPlugin();
   void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Gps getData();

@@ -46,7 +46,7 @@
 
 class SensorBaroPlugin : public SensorPlugin {
  public:
-  SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim);
+  SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~SensorBaroPlugin();
   void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Barometer getData();

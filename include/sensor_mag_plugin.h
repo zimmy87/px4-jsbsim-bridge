@@ -55,7 +55,7 @@ static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2;  // [s]
 class SensorMagPlugin : public SensorPlugin {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorMagPlugin(JSBSim::FGFDMExec* jsbsim);
+  SensorMagPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~SensorMagPlugin();
   void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Magnetometer getData();

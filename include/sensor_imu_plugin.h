@@ -59,7 +59,7 @@ static constexpr double kDefaultGravityMagnitude = 9.8068;
 class SensorImuPlugin : public SensorPlugin {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorImuPlugin(JSBSim::FGFDMExec* jsbsim);
+  SensorImuPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~SensorImuPlugin();
   void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Imu getData();

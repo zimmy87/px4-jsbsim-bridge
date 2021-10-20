@@ -46,7 +46,7 @@
 
 class SensorAirspeedPlugin : public SensorPlugin {
  public:
-  SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim);
+  SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~SensorAirspeedPlugin();
   void setSensorConfigs(const TiXmlElement& configs);
   SensorData::Airspeed getData();

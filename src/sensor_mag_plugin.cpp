@@ -41,7 +41,7 @@
 
 #include "sensor_mag_plugin.h"
 
-SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {
+SensorMagPlugin::SensorMagPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client) : SensorPlugin(jsbsim, client) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 
@@ -62,7 +62,7 @@ void SensorMagPlugin::setSensorConfigs(const TiXmlElement& configs) {
 }
 
 SensorData::Magnetometer SensorMagPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
+  double sim_time = _airsim_client->getJSBSimTime();
   double dt = sim_time - _last_sim_time;
 
   Eigen::Vector3d mag_b = getMagFromJSBSim();
@@ -81,11 +81,11 @@ Eigen::Vector3d SensorMagPlugin::getMagFromJSBSim() {
   if (_jsb_mag_x == "none" && _jsb_mag_y == "none" && _jsb_mag_z == "none") {
     double lat_deg, lon_deg, roll_rad, pitch_rad, heading_rad;
 
-    lat_deg = _sim_ptr->GetPropertyValue(_jsb_mag_lat);
-    lon_deg = _sim_ptr->GetPropertyValue(_jsb_mag_lon);
-    roll_rad = _sim_ptr->GetPropertyValue(_jsb_mag_roll);
-    pitch_rad = _sim_ptr->GetPropertyValue(_jsb_mag_pitch);
-    heading_rad = wrap_pi(_sim_ptr->GetPropertyValue(_jsb_mag_hdg));
+    lat_deg = _airsim_client->getJSBSimProperty(_jsb_mag_lat);
+    lon_deg = _airsim_client->getJSBSimProperty(_jsb_mag_lon);
+    roll_rad = _airsim_client->getJSBSimProperty(_jsb_mag_roll);
+    pitch_rad = _airsim_client->getJSBSimProperty(_jsb_mag_pitch);
+    heading_rad = wrap_pi(_airsim_client->getJSBSimProperty(_jsb_mag_hdg));
 
     // Magnetic strength (10^5xnanoTesla)
     float strength_ga = 0.01f * get_mag_strength(lat_deg, lon_deg);
@@ -120,9 +120,9 @@ Eigen::Vector3d SensorMagPlugin::getMagFromJSBSim() {
     // Enable reading magnetic values directly from JSBSim when supplied with system file
     // NOTE: Current JSBSim magnetometer startup sequence is not stable for PX4 in V1.1.0
     // See https://github.com/JSBSim-Team/jsbsim/issues/332
-    _mag_g[0] = _sim_ptr->GetPropertyValue(_jsb_mag_x) * 1e-5;
-    _mag_g[1] = _sim_ptr->GetPropertyValue(_jsb_mag_y) * 1e-5;
-    _mag_g[2] = _sim_ptr->GetPropertyValue(_jsb_mag_z) * 1e-5;
+    _mag_g[0] = _airsim_client->getJSBSimProperty(_jsb_mag_x) * 1e-5;
+    _mag_g[1] = _airsim_client->getJSBSimProperty(_jsb_mag_y) * 1e-5;
+    _mag_g[2] = _airsim_client->getJSBSimProperty(_jsb_mag_z) * 1e-5;
     return _mag_g;
   }
 }

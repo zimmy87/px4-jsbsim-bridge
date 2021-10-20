@@ -41,7 +41,7 @@
 
 #include "sensor_baro_plugin.h"
 
-SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {
+SensorBaroPlugin::SensorBaroPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client) : SensorPlugin(jsbsim, client) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 }
 
@@ -57,7 +57,7 @@ void SensorBaroPlugin::setSensorConfigs(const TiXmlElement& configs) {
 }
 
 SensorData::Barometer SensorBaroPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
+  double sim_time = _airsim_client->getJSBSimTime();
   double dt = sim_time - _last_sim_time;
 
   double temperature = getAirTemperature() + _temperature_stddev * _standard_normal_distribution(_random_generator);
@@ -77,11 +77,11 @@ SensorData::Barometer SensorBaroPlugin::getData() {
   return data;
 }
 
-float SensorBaroPlugin::getAirTemperature() { return rankineToCelsius(_sim_ptr->GetPropertyValue(_jsb_baro_temp)); }
+float SensorBaroPlugin::getAirTemperature() { return rankineToCelsius(_airsim_client->getJSBSimProperty(_jsb_baro_temp)); }
 
-float SensorBaroPlugin::getPressureAltitude() { return ftToM(_sim_ptr->GetPropertyValue(_jsb_baro_pressure_alt)); }
+float SensorBaroPlugin::getPressureAltitude() { return ftToM(_airsim_client->getJSBSimProperty(_jsb_baro_pressure_alt)); }
 
-float SensorBaroPlugin::getAirPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_baro_air_pressure)); }
+float SensorBaroPlugin::getAirPressure() { return psfToMbar(_airsim_client->getJSBSimProperty(_jsb_baro_air_pressure)); }
 
 void SensorBaroPlugin::addNoise(double abs_pressure, const double dt) {
   if (dt <= 0.0) return;

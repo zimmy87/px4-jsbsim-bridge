@@ -41,7 +41,7 @@
 
 #include "sensor_imu_plugin.h"
 
-SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {
+SensorImuPlugin::SensorImuPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client) : SensorPlugin(jsbsim, client) {
   _standard_normal_distribution = std::normal_distribution<double>(0.0, 1.0);
 
   double sigma_bon_g = gyroscope_turn_on_bias_sigma;
@@ -72,7 +72,7 @@ void SensorImuPlugin::setSensorConfigs(const TiXmlElement& configs) {
 }
 
 SensorData::Imu SensorImuPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
+  double sim_time = _airsim_client->getJSBSimTime();
   double dt = sim_time - _last_sim_time;
 
   Eigen::Vector3d accel = getAccelFromJSBSim();
@@ -89,17 +89,17 @@ SensorData::Imu SensorImuPlugin::getData() {
 }
 
 Eigen::Vector3d SensorImuPlugin::getAccelFromJSBSim() {
-  double x = _sim_ptr->GetPropertyValue(_jsb_acc_x);
-  double y = _sim_ptr->GetPropertyValue(_jsb_acc_y);
-  double z = _sim_ptr->GetPropertyValue(_jsb_acc_z);
+  double x = _airsim_client->getJSBSimProperty(_jsb_acc_x);
+  double y = _airsim_client->getJSBSimProperty(_jsb_acc_y);
+  double z = _airsim_client->getJSBSimProperty(_jsb_acc_z);
 
   return Eigen::Vector3d(ftToM(x), ftToM(y), ftToM(z));
 }
 
 Eigen::Vector3d SensorImuPlugin::getGyroFromJSBSim() {
-  double x = _sim_ptr->GetPropertyValue(_jsb_gyro_x);
-  double y = _sim_ptr->GetPropertyValue(_jsb_gyro_y);
-  double z = _sim_ptr->GetPropertyValue(_jsb_gyro_z);
+  double x = _airsim_client->getJSBSimProperty(_jsb_gyro_x);
+  double y = _airsim_client->getJSBSimProperty(_jsb_gyro_y);
+  double z = _airsim_client->getJSBSimProperty(_jsb_gyro_z);
 
   return Eigen::Vector3d(x, y, z);
 }

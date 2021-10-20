@@ -59,7 +59,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg,
 
   // Instantiate sensors
   if (CheckConfigElement(config, "sensors", "imu")) {
-    _imu_sensor = std::make_unique<SensorImuPlugin>(_fdmexec);
+    _imu_sensor = std::make_unique<SensorImuPlugin>(_fdmexec, _airsim_client);
     _imu_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "imu"));
   } else {
     std::cerr << "Could not find IMU sensor " << std::endl;
@@ -67,26 +67,26 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg,
   }
 
   if (CheckConfigElement(config, "sensors", "gps")) {
-    _gps_sensor = std::make_unique<SensorGpsPlugin>(_fdmexec);
+    _gps_sensor = std::make_unique<SensorGpsPlugin>(_fdmexec, _airsim_client);
     _gps_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "gps"));
   }
 
   if (CheckConfigElement(config, "sensors", "barometer")) {
-    _baro_sensor = std::make_unique<SensorBaroPlugin>(_fdmexec);
+    _baro_sensor = std::make_unique<SensorBaroPlugin>(_fdmexec, _airsim_client);
     _baro_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "barometer"));
   }
 
   if (CheckConfigElement(config, "sensors", "magnetometer")) {
-    _mag_sensor = std::make_unique<SensorMagPlugin>(_fdmexec);
+    _mag_sensor = std::make_unique<SensorMagPlugin>(_fdmexec, _airsim_client);
     _mag_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "magnetometer"));
   }
 
   if (CheckConfigElement(config, "sensors", "airspeed")) {
-    _airspeed_sensor = std::make_unique<SensorAirspeedPlugin>(_fdmexec);
+    _airspeed_sensor = std::make_unique<SensorAirspeedPlugin>(_fdmexec, _airsim_client);
     _airspeed_sensor->setSensorConfigs(GetXmlElement(config, "sensors", "airspeed"));
   }
 
-  _actuators = std::make_unique<ActuatorPlugin>(_fdmexec);
+  _actuators = std::make_unique<ActuatorPlugin>(_fdmexec, _airsim_client);
   _actuators->SetActuatorConfigs(config);
 
   _realtime_factor = _cfg.getRealtimeFactor();
@@ -173,7 +173,8 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
 void JSBSimBridge::Run() {
   // Get Simulation time from JSBSim
   auto step_start_time = std::chrono::system_clock::now();
-  double simtime = _fdmexec->GetSimTime();
+  //double simtime = _fdmexec->GetSimTime();
+  double simtime = _airsim_client->getJSBSimTime();
 
   // Update sensor messages
   if (_imu_sensor && _imu_sensor->updated()) {
@@ -210,13 +211,17 @@ void JSBSimBridge::Run() {
     _actuators->SetActuatorCommands(actuator_controls);
   }
 
-  _result = _fdmexec->Run();
+  //_result = _fdmexec->Run();
+  //_airsim_client->simContinueForTime(_dt);
+  //while (!_airsim_client->simIsPaused())
+  //  usleep(100);
+  usleep(3000);
 
-  auto step_stop_time = std::chrono::system_clock::now();
+  /*auto step_stop_time = std::chrono::system_clock::now();
 
   std::chrono::duration<double> elapsed_time = step_start_time - step_stop_time;
   if (_realtime_factor > 0) {
     double sleep = _dt / _realtime_factor - elapsed_time.count();
     if (sleep > 0) usleep(sleep * 1e6);
-  }
+  }*/
 }

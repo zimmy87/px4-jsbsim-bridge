@@ -47,6 +47,8 @@
 #include <tinyxml.h>
 #include <Eigen/Eigen>
 
+#include "vehicles/multirotor/api/MultirotorRpcLibClient.hpp"
+
 struct ActuatorMap {
   size_t index;
   double scale;
@@ -55,10 +57,13 @@ struct ActuatorMap {
 
 class ActuatorPlugin {
  public:
-  ActuatorPlugin(JSBSim::FGFDMExec *jsbsim);
+  ActuatorPlugin(JSBSim::FGFDMExec *jsbsim, msr::airlib::MultirotorRpcLibClient *client);
   ~ActuatorPlugin();
   bool SetActuatorCommands(const Eigen::VectorXd &actuator_commands);
   bool SetActuatorConfigs(const TiXmlHandle &config);
+ 
+ protected:
+  msr::airlib::MultirotorRpcLibClient *_airsim_client;
 
  private:
   bool SetCommandToProperty(float value, std::string property);

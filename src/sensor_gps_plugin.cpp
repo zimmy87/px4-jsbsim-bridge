@@ -42,7 +42,7 @@
 #include "sensor_gps_plugin.h"
 #include "common.h"
 
-SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) { _update_rate = 1.0; }
+SensorGpsPlugin::SensorGpsPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client) : SensorPlugin(jsbsim, client) { _update_rate = 1.0; }
 
 SensorGpsPlugin::~SensorGpsPlugin() {}
 
@@ -61,7 +61,7 @@ void SensorGpsPlugin::setSensorConfigs(const TiXmlElement& configs) {
 }
 
 SensorData::Gps SensorGpsPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
+  double sim_time = _airsim_client->getJSBSimTime();
   double dt = sim_time - _last_sim_time;
 
   SensorData::Gps data;
@@ -74,39 +74,39 @@ SensorData::Gps SensorGpsPlugin::getData() {
 
 SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   SensorData::Gps ret;
-  ret.time_utc_usec = _sim_ptr->GetSimTime() * 1e6;
+  ret.time_utc_usec = _airsim_client->getJSBSimTime() * 1e6;
 
   if (_jsb_gps_fix_type == "none") {
     ret.fix_type = 3;
   } else {
-    ret.fix_type = _sim_ptr->GetPropertyValue(_jsb_gps_fix_type);
+    ret.fix_type = _airsim_client->getJSBSimProperty(_jsb_gps_fix_type);
   }
 
   if (_jsb_gps_eph == "none") {
     ret.eph = 1 * 100;
   } else {
-    ret.eph = _sim_ptr->GetPropertyValue(_jsb_gps_eph) * 100;
+    ret.eph = _airsim_client->getJSBSimProperty(_jsb_gps_eph) * 100;
   }
 
   if (_jsb_gps_epv == "none") {
     ret.epv = 2 * 100;
   } else {
-    ret.epv = _sim_ptr->GetPropertyValue(_jsb_gps_epv) * 100;
+    ret.epv = _airsim_client->getJSBSimProperty(_jsb_gps_epv) * 100;
   }
 
   if (_jsb_gps_satellites == "none") {
     ret.satellites_visible = 16;
   } else {
-    ret.satellites_visible = _sim_ptr->GetPropertyValue(_jsb_gps_satellites);
+    ret.satellites_visible = _airsim_client->getJSBSimProperty(_jsb_gps_satellites);
   }
 
-  ret.latitude_deg = _sim_ptr->GetPropertyValue(_jsb_gps_lat) * 1e7;
-  ret.longitude_deg = _sim_ptr->GetPropertyValue(_jsb_gps_lon) * 1e7;
-  ret.altitude = _sim_ptr->GetPropertyValue(_jsb_gps_alt) * 1e3;
-  ret.velocity_north = ftToM(_sim_ptr->GetPropertyValue(_jsb_gps_v_north)) * 100;
-  ret.velocity_east = ftToM(_sim_ptr->GetPropertyValue(_jsb_gps_v_east)) * 100;
-  ret.velocity_down = ftToM(_sim_ptr->GetPropertyValue(_jsb_gps_v_down)) * 100;
-  ret.velocity = ftToM(_sim_ptr->GetPropertyValue(_jsb_gps_velocity)) * 100;
+  ret.latitude_deg = _airsim_client->getJSBSimProperty(_jsb_gps_lat) * 1e7;
+  ret.longitude_deg = _airsim_client->getJSBSimProperty(_jsb_gps_lon) * 1e7;
+  ret.altitude = _airsim_client->getJSBSimProperty(_jsb_gps_alt) * 1e3;
+  ret.velocity_north = ftToM(_airsim_client->getJSBSimProperty(_jsb_gps_v_north)) * 100;
+  ret.velocity_east = ftToM(_airsim_client->getJSBSimProperty(_jsb_gps_v_east)) * 100;
+  ret.velocity_down = ftToM(_airsim_client->getJSBSimProperty(_jsb_gps_v_down)) * 100;
+  ret.velocity = ftToM(_airsim_client->getJSBSimProperty(_jsb_gps_velocity)) * 100;
   ret.cog = wrap_pi_deg(atan2f(ret.velocity_east, ret.velocity_north) * (180 / M_PI)) * 100;
 
   ret.id = 1;

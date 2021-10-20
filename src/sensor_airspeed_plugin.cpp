@@ -41,7 +41,7 @@
 
 #include "sensor_airspeed_plugin.h"
 
-SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim) : SensorPlugin(jsbsim) {}
+SensorAirspeedPlugin::SensorAirspeedPlugin(JSBSim::FGFDMExec* jsbsim, msr::airlib::MultirotorRpcLibClient *client) : SensorPlugin(jsbsim, client) {}
 
 SensorAirspeedPlugin::~SensorAirspeedPlugin() {}
 
@@ -51,7 +51,7 @@ void SensorAirspeedPlugin::setSensorConfigs(const TiXmlElement& configs) {
 }
 
 SensorData::Airspeed SensorAirspeedPlugin::getData() {
-  double sim_time = _sim_ptr->GetSimTime();
+  double sim_time = _airsim_client->getJSBSimTime();
   double dt = sim_time - _last_sim_time;
 
   const double diff_pressure_noise = standard_normal_distribution_(_random_generator) * _diff_pressure_stddev;
@@ -65,4 +65,4 @@ SensorData::Airspeed SensorAirspeedPlugin::getData() {
   return data;
 }
 
-double SensorAirspeedPlugin::getDiffPressure() { return psfToMbar(_sim_ptr->GetPropertyValue(_jsb_diff_pressure)); }
+double SensorAirspeedPlugin::getDiffPressure() { return psfToMbar(_airsim_client->getJSBSimProperty(_jsb_diff_pressure)); }

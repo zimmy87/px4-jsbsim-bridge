@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 project(jsbsim_bridge)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread")
 
+set(JSBSIM_ROOT_DIR "/usr/bin")
 set(AIRSIM_ROOT "/home/zimmy/Downloads/AirSim_gcc")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")

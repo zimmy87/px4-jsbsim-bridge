@@ -41,14 +41,14 @@
 
 #include "sensor_plugin.h"
 
-SensorPlugin::SensorPlugin(JSBSim::FGFDMExec *jsbsim) : _sim_ptr(jsbsim) {}
+SensorPlugin::SensorPlugin(JSBSim::FGFDMExec *jsbsim, msr::airlib::MultirotorRpcLibClient *client) : _sim_ptr(jsbsim), _airsim_client(client) {}
 
 SensorPlugin::~SensorPlugin() {}
 
 void SensorPlugin::setUpdateRate(double update_rate) { _update_rate = update_rate; }
 
 bool SensorPlugin::updated() {
-  double sim_time = _sim_ptr->GetSimTime();
+  double sim_time = _airsim_client->getJSBSimTime();
   double dt = sim_time - _last_sim_time;
 
   if (dt > 1 / _update_rate || _update_rate == 0) {
