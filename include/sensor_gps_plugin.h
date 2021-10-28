@@ -43,6 +43,7 @@
 
 #include "common.h"
 #include "sensor_plugin.h"
+#include "sensors/gps/GpsBase.hpp"
 
 class SensorGpsPlugin : public SensorPlugin {
  public:

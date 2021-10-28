@@ -75,6 +75,7 @@ SensorData::Gps SensorGpsPlugin::getData() {
 SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   SensorData::Gps ret;
   ret.time_utc_usec = _airsim_client->getJSBSimTime() * 1e6;
+  const auto& gps_data = _airsim_client->getGpsData();
 
   if (_jsb_gps_fix_type == "none") {
     ret.fix_type = 3;
@@ -108,6 +109,47 @@ SensorData::Gps SensorGpsPlugin::getGpsFromJSBSim() {
   ret.velocity_down = ftToM(_airsim_client->getJSBSimProperty(_jsb_gps_v_down)) * 100;
   ret.velocity = ftToM(_airsim_client->getJSBSimProperty(_jsb_gps_velocity)) * 100;
   ret.cog = wrap_pi_deg(atan2f(ret.velocity_east, ret.velocity_north) * (180 / M_PI)) * 100;
+
+  cout << "===JSBSim GPS data===" << std::endl;
+  cout << "fix_type: " << ret.fix_type << std::endl;
+  cout << "eph: " << ret.eph << std::endl;
+  cout << "epv: " << ret.epv << std::endl;
+  cout << "satellites_visible: " << ret.satellites_visible << std::endl;
+  cout << _jsb_gps_lat << ": " << ret.latitude_deg << std::endl;
+  cout << _jsb_gps_lon << ": " << ret.longitude_deg << std::endl;
+  cout << "altitude: " << ret.altitude << std::endl;
+  cout << "velocity_north: " << ret.velocity_north << std::endl;
+  cout << "velocity_east: " << ret.velocity_east << std::endl;
+  cout << "velocity_down: " << ret.velocity_down << std::endl;
+  cout << _jsb_gps_velocity << ": " << ret.velocity << std::endl;
+  cout << "cog: " << ret.cog << std::endl;
+  
+  //ret.fix_type = gps_data.gnss.fix_type;
+  //ret.eph = gps_data.gnss.eph * 100;
+  //ret.epv = gps_data.gnss.epv * 100;
+  //ret.satellites_visible = 16;
+  ret.latitude_deg = gps_data.gnss.geo_point.latitude * 1e7;
+  ret.longitude_deg = gps_data.gnss.geo_point.longitude * 1e7;
+  ret.altitude = gps_data.gnss.geo_point.altitude * 1e3;
+  ret.velocity_north = gps_data.gnss.velocity.x() * 100;
+  ret.velocity_east = gps_data.gnss.velocity.y() * 100;
+  ret.velocity_down = gps_data.gnss.velocity.z() * 100;
+  ret.velocity = std::sqrt(std::pow(gps_data.gnss.velocity.x(), 2) + std::pow(gps_data.gnss.velocity.y(), 2) + std::pow(gps_data.gnss.velocity.z(), 2)) * 100;
+  ret.cog = wrap_pi_deg(atan2f(gps_data.gnss.velocity.y(), gps_data.gnss.velocity.x()) * (180 / M_PI)) * 100;
+  
+  cout << "===AirSim GPS data===" << std::endl;
+  cout << "fix_type: " << ret.fix_type << std::endl;
+  cout << "eph: " << ret.eph << std::endl;
+  cout << "epv: " << ret.epv << std::endl;
+  cout << "satellites_visible: " << ret.satellites_visible << std::endl;
+  cout << _jsb_gps_lat << ": " << ret.latitude_deg << std::endl;
+  cout << _jsb_gps_lon << ": " << ret.longitude_deg << std::endl;
+  cout << "altitude: " << ret.altitude << std::endl;
+  cout << "velocity_north: " << ret.velocity_north << std::endl;
+  cout << "velocity_east: " << ret.velocity_east << std::endl;
+  cout << "velocity_down: " << ret.velocity_down << std::endl;
+  cout << _jsb_gps_velocity << ": " << ret.velocity << std::endl;
+  cout << "cog: " << ret.cog << std::endl;
 
   ret.id = 1;
 

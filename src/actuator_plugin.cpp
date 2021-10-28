@@ -57,9 +57,7 @@ bool ActuatorPlugin::SetActuatorCommands(const Eigen::VectorXd &actuator_command
 
 bool ActuatorPlugin::SetCommandToProperty(float value, std::string property) {
   double old_value = _airsim_client->getJSBSimProperty(property);
-  cout << "old actuator " << property << ": " << old_value << std::endl;
   _airsim_client->setJSBSimProperty(property, value);
-  cout << "new actuator " << property << ": " << value << std::endl;
   return true;
 }
 

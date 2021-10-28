@@ -215,7 +215,7 @@ void JSBSimBridge::Run() {
   //_airsim_client->simContinueForTime(_dt);
   //while (!_airsim_client->simIsPaused())
   //  usleep(100);
-  usleep(3000);
+  usleep(1500);
 
   /*auto step_stop_time = std::chrono::system_clock::now();
 
